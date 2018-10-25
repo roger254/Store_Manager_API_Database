@@ -3,7 +3,7 @@ from datetime import datetime
 from app.api.v1.models.base_model import BaseDatabase
 
 
-class Product(BaseDatabase):
+class Products(BaseDatabase):
     """Represents the  Product Model"""
 
     def __init__(self, p_name=None, p_price=None, p_quantity=None):
@@ -36,7 +36,7 @@ class Product(BaseDatabase):
 
     def map_product(self, data):
         """map to an object"""
-        product = Product(
+        product = Products(
             p_name=data[1],
             p_price=data[2],
             p_quantity=data[3],
@@ -97,7 +97,7 @@ class Product(BaseDatabase):
         """Update an existing product"""
         self.cur.execute(
             "UPDATE products SET p_name = %s, p_price = %s, p_quantity = %s WHERE id = %s",
-            (self.p_name, self.p_price, self.p_quantity)
+            (self.p_name, self.p_price, self.p_quantity, product_id)
         )
         self.save()
         self.close()
