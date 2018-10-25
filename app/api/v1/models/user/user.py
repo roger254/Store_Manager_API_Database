@@ -1,28 +1,60 @@
-import datetime as date
+from werkzeug.security import generate_password_hash
+
+from app.api.v1.models.base_model import BaseDatabase
 
 
-class User:
+class User(BaseDatabase):
     """Represents The User Model"""
 
-    def __init__(self, user_id, user_name, password, user_type):
-        self.user_id = user_id
-        self.user_name = user_name
-        self.password = password
-        self.user_type = user_type
-        self.date_created = date.datetime.now()
+    def __init__(self, username=None, password=None, is_admin=False):
+        super().__init__()
+        self.username = username
+        if password:
+            self.hashed_password = generate_password_hash(password)
+        self.is_admin = is_admin
 
-    def validate_data(self):
-        errors = []
+    def create_user_table(self):
+        """Create user table"""
+        self.create_table(
+            """
+            CREATE TABLE IF NOT EXIST users(
+            id serial PRIMARY KEY,
+            username VARCHAR NOT NULL,
+            password VARCHAR NOT NULL,
+            is_admin BOOLEAN NOT NULL
+            );
+            """
+        )
 
-        if len(self.user_name) < 8:
-            errors.append("Username Must be at least 8 characters")
-        if len(self.password) < 8:
-            errors.append("Password must be at least 8 characters ")
-        return errors
+    def add(self):
+        """add new user"""
+        query = "INSERT INTO users(username,password,is_admin) VALUES(%s,%s,%s,%s)"
+        data = (self.username, self.hashed_password, self.is_admin)
+        self.cur.execute(query, data)
+        self.save()
 
-    def user_details(self):
+    def fetch_by_username(self, username):
+        """Get user by username"""
+        self.cur.execute(
+            "SELECT * FROM users WHERE username=%s", (username,)
+        )
+        user = self.cur.fetchone()
+        if user:
+            return self.map_details(user)
+        return None
+
+    def map_details(self, data):
+        """Create user from db data"""
+        self.user_id = data[0]
+        self.username = data[1]
+        self.hashed_password = data[3]
+        self.is_admin = data[4]
+
+    def serialize(self):
+        """Return user as a dict"""
         return dict(
-            user_id=self.user_id,
-            user_name=self.user_name,
-            user_type=self.user_type
+            id=self.id,
+            username=self.username,
+            hashed_password=self.hashed_password,
+            is_admin=self.is_admin
         )
