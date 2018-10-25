@@ -17,7 +17,7 @@ class User(BaseDatabase):
         """Create user table"""
         self.create_table(
             """
-            CREATE TABLE IF NOT EXIST users(
+            CREATE TABLE IF NOT EXISTS users(
             id serial PRIMARY KEY,
             username VARCHAR NOT NULL,
             password VARCHAR NOT NULL,
@@ -28,7 +28,7 @@ class User(BaseDatabase):
 
     def add(self):
         """add new user"""
-        query = "INSERT INTO users(username,password,is_admin) VALUES(%s,%s,%s,%s)"
+        query = "INSERT INTO users(username,password,is_admin) VALUES(%s,%s,%s)"
         data = (self.username, self.hashed_password, self.is_admin)
         self.cur.execute(query, data)
         self.save()
@@ -58,3 +58,7 @@ class User(BaseDatabase):
             hashed_password=self.hashed_password,
             is_admin=self.is_admin
         )
+
+    def drop(self):
+        """Drop if it exists"""
+        self.drop_table('users')
