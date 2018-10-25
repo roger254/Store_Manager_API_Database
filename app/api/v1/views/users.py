@@ -1,69 +1,111 @@
-# from flask import request, jsonify, make_response
-# from flask_classful import FlaskView, route
-#
-# from app.api.v1.models.user.regular import Regular
-# from .auth import generate_user_token
-#
-# users = [
-#     Regular(1, 'Attendant 1', 'attpass1'),
-#     Regular(2, 'Attendant 2', 'attpass2'),
-#     Regular(3, 'Attendant 3', 'attpass3'),
-#     Regular(4, 'Attendant 4', 'attpass4')
-# ]
-#
-#
-# class UserView(FlaskView):
-#     """Product View Class"""
-#
-#     @route('/register', methods=['POST'])
-#     def post(self):
-#         """Get user data"""
-#         post_data = request.data
-#         # if it exists
-#         user_name = request.data['user_name']
-#         password = request.data['password']
-#         user = Regular(
-#             len(users) + 1,
-#             user_name,
-#             password
-#         )
-#         invalid_user = user.validate_data()
-#         if invalid_user:
-#             return make_response(jsonify(invalid_user)), 208
-#         for i in range(len(users)):
-#             if users[i].user_name == user.user_name:
-#                 message = {
-#                     'status': 'Registration Failed',
-#                     'message': 'User Exists. Please Log in!'
-#                 }
-#                 return make_response(jsonify(message)), 202
-#         else:
-#             if post_data:
-#                 users.append(user)
-#                 return make_response(jsonify(user.user_details())), 201
-#
-#     @route('/login', methods=['POST'])
-#     def login(self):
-#         try:
-#             user = request.data['user_name']
-#             user_pass = request.data['password']
-#             for i in range(len(users)):
-#                 if users[i].user_name == user and users[i].password == user_pass:
-#                     access_token = generate_user_token(users[i].user_id)
-#                     if access_token:
-#                         response = {
-#                             "message": "You've logged in successfully.",
-#                             "access_token": access_token.decode()
-#                         }
-#
-#                         return make_response(jsonify(response)), 200
-#             else:
-#                 response = {
-#                     "message": "Invalid username or password, Please try again"
-#                 }
-#                 return make_response(jsonify(response)), 401
-#         except Exception as e:
-#             response = {
-#                 'message': str(e)
-#             }
-#             return make_response(jsonify(response)), 500
+import datetime
+from flask_classful import FlaskView
+from flask_jwt_extended import create_access_token
+from flask_restful import reqparse
+from werkzeug.security import check_password_hash
+
+from app.api.v1.models.user.user import User
+from app.api.v1.views.utils import Validate
+
+
+class Register(FlaskView):
+    """Register a new user"""
+    parser = reqparse.RequestParser()
+    parser.add_argument(
+        'username',
+        type=str,
+        required=True,
+        help='Username is required'
+    )
+    parser.add_argument(
+        'password',
+        type=str,
+        required=True,
+        help='Password is required'
+    )
+
+    def post(self):
+        """Create the user"""
+        user_data = Register().parser.parse_args(strict=True)
+        username = user_data['username']
+        password = user_data['password']
+
+        invalid_username = Validate().is_input_valid(username)
+        if invalid_username:
+            return {
+                       'message': invalid_username
+                   }, 400
+
+        invalid_password = Validate().is_password_valid(password)
+        if invalid_password:
+            return {
+                       'message': invalid_password
+                   }, 400
+
+        if User().fetch_by_username(username):
+            return {
+                'message': 'User {} already exists'.format(username)
+            }
+
+        user = User(username=username, password=password)
+        user.add()
+
+        return {
+            'message': 'User successfully added',
+            'user': user.serialize()
+        }
+
+
+class Login(FlaskView):
+    """Login a user"""
+    parser = reqparse.RequestParser()
+    parser.add_argument(
+        'username',
+        type=str,
+        required=True,
+        help="Provide a valid username"
+    )
+    parser.add_argument(
+        'password',
+        type=str,
+        required=True,
+        help="Provide a valid password"
+    )
+
+    def post(self):
+        """Login the user"""
+        user_data = Login.parser.parse_args()
+        username = user_data['username']
+        password = user_data['password']
+
+        invalid_username = Validate().is_input_valid(username)
+        if invalid_username:
+            return {
+                       'message': invalid_username
+                   }, 400
+
+        invalid_password = Validate().is_password_valid(password)
+        if invalid_password:
+            return {
+                       'message': invalid_password
+                   }, 400
+
+        user = User().fetch_by_username(username)
+        if not user:
+            return {
+                       'message': 'User not found'
+                   }, 404
+
+        if not check_password_hash(user.password_hash, password):
+            return {
+                       'message': 'Password is incorrect'
+                   }, 401
+        exp = datetime.timedelta(minutes=20)
+        token = create_access_token(
+            identity=user.serialize(),
+            expires_delta=exp
+        )
+        return {
+                   'message': 'Successfully logged in.',
+                   'access_token': token
+               }, 200

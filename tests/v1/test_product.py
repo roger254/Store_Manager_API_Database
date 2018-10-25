@@ -20,7 +20,7 @@ class ProductTestCase(AppBaseTest):
 
     def test_product_creation(self):
         """Test creating new product"""
-        access_token = self.get_admin_token()
+        self.get_admin_token()
         res = self.post_product()
         self.assertEqual(res.status_code, 201)
 

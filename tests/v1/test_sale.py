@@ -18,14 +18,14 @@ class SaleTestCase(AppBaseTest):
 
     def test_sale_creation(self):
         """Test creating sale"""
-        access_token = self.get_user_token()
+        self.get_user_token()
         self.post_product()
         res = self.post_sale()
         self.assertEqual(res.status_code, 201)
 
     def test_admin_making_sale(self):
         """Testing if admin can make sale post"""
-        access_token = self.get_admin_token()
+        self.get_admin_token()
         self.post_product()
         res = self.post_sale()
         self.assertEqual(res.status_code, 400)

@@ -52,18 +52,19 @@ class ProductView(FlaskView):
         p_name = product_data['p_name']
         p_price = product_data['p_price']
         p_quantity = product_data['p_quantity']
-        is_invalidate = Validate.is_input_valid(p_name)
+
+        is_invalidate = Validate().is_input_valid(p_name)
         if is_invalidate:
             return {
-                       'message': 'Product name must be a string'
+                       'message': is_invalidate
                    }, 400
 
         # check if product exists
         product = Products().fetch_by_p_name(p_name=p_name)
         if product:
             return {
-                'message': 'Product already exist'
-            }
+                       'message': 'Product already exist'
+                   }, 400
 
         prod = Products(
             p_name=p_name,
@@ -71,10 +72,11 @@ class ProductView(FlaskView):
             p_quantity=int(p_quantity)
         )
         prod.add()
+
         return {
-            'message': 'Product added',
-            'product': prod.serialize()
-        }
+                   'message': 'Product added',
+                   'product': prod.serialize()
+               }, 201
 
     @route('/<p_id>')
     def get(self, p_id):
@@ -85,5 +87,5 @@ class ProductView(FlaskView):
                        'message': 'Product does not exist'
                    }, 404
         return {
-            'Product': product.serialize()
-        }
+                   'Product': product.serialize()
+               }, 201

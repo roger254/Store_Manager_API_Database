@@ -6,7 +6,7 @@ app = create_app('testing')
 
 @app.cli.command()
 def migrate():
-    User.create_user_table()
+    User().create_user_table()
 
 
 @app.cli.command()
