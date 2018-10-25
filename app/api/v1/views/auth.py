@@ -1,61 +1,36 @@
-from datetime import datetime, timedelta
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from functools import wraps
 
-import jwt
-from flask import request, make_response, jsonify
-
-# env secret
-FLASK_SECRET = 'to be changed'
+from app.api.v1.models.user.user import User
 
 
-def generate_user_token(user_id):
-    """Generate access token for user using the id"""
-    try:
-        payload = {
-            'exp': datetime.utcnow() + timedelta(minutes=10),
-            'iat': datetime.utcnow(),
-            'sub': user_id
-        }
-        access_token = jwt.encode(
-            payload,
-            FLASK_SECRET,
-            algorithm='HS256'
-        )
-        return access_token
-    except Exception as e:
-        # Return the error message as string
-        return str(e)
+def requires_admin(f):
+    """Admin access only"""
 
-
-def decode_token(token):
-    """Decodes the access token """
-    try:
-        #  decode the token using our secret var
-        payload = jwt.decode(token, FLASK_SECRET)
-        return payload['sub']
-    except jwt.ExpiredSignatureError:
-        # the token is expired
-        return "Expired token. Please login to get a new token"
-    except jwt.InvalidTokenError:
-        # the token is invalid, return an error string
-        return "Invalid token. Please register or login"
-
-
-def authenticate(f):
     @wraps(f)
-    def wrapped(*args, **kwargs):
-        auth_header = request.headers.get("Authorization")
-        access_token = auth_header.split(" ")[1]
-        if access_token:
-            user_id = decode_token(access_token)
-            if not isinstance(user_id, str):
-                return f(*args, **kwargs)
-            else:
-                message = user_id
-                response = {
-                    'status': 'failed',
-                    'message': message
-                }
-                return make_response(jsonify(response))
+    def wrapper(*args, **kwargs):
+        user = User().fetch_by_username(get_jwt_identity()['username'])
+        if not user.is_admin:
+            return {
+                       'status': 'Unauthorized',
+                       'message': "User must be admin"
+                   }, 401
+        return f(*args, **kwargs)
 
-    return wrapped
+    return wrapper
+
+
+def requires_user(f):
+    """Admin access only"""
+
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        user = User().fetch_by_username(get_jwt_identity()['username'])
+        if user.is_admin:
+            return {
+                       'status': 'Unwanted Access',
+                       'message': "User must be Attendant"
+                   }, 401
+        return f(*args, **kwargs)
+
+    return wrapper

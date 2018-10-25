@@ -26,8 +26,7 @@ def test():
 # usage python manage.py migrate
 @manager.command
 def migrate():
-    user = User()
-    user.create_user_table()
+    User().create_user_table()
 
 
 # usage python manage.py create_admin
