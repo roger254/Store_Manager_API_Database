@@ -1,0 +1,10 @@
+language: python
+python:
+- "3.5"
+install:
+- pip install --upgrade pip
+- pip install -r requirements.txt
+
+script:
+- coverage run manage.py test
+- codeclimate-test-reporter --token c597c43ec71041c4499459c0203f0bd8825b9d305527c07b11296b994a3c724b
