@@ -82,6 +82,7 @@ class Product(FlaskView):
                    'Product': product.serialize()
                }, 201
 
+    @requires_admin
     @route('/', methods=['PUT'])
     def put(self):
         """Update an item"""
@@ -98,6 +99,7 @@ class Product(FlaskView):
             return {
                 'message': 'Product quantity(p_quantity) required'
             }
+
         p_name = prod_data['p_name']
         product = Products().fetch_by_p_name(p_name)
         if not product:
@@ -118,3 +120,25 @@ class Product(FlaskView):
             'message': 'Product Successfully Update',
             'product': product.serialize()
         }
+
+    @requires_admin
+    @route('/', methods=['DELETE'])
+    def delete(self):
+        """Delete a product"""
+        product_data = request.data
+
+        if 'p_name' not in product_data:
+            return {
+                       'message': 'Product name(p_name) is required'
+                   }, 400
+        p_name = product_data['p_name']
+        product = Products().fetch_by_p_name(p_name)
+        if not product:
+            return {
+                       'message': 'Product {} not found'.format(p_name)
+                   }, 400
+        product.delete(product.id)
+        return {
+                   'message': 'Deletion Successful',
+                   'product': product.serialize()
+               }, 202
