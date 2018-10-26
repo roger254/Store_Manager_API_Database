@@ -30,8 +30,8 @@ class UserTestCase(AppBaseTest):
         """Test for incorrect pass"""
         self.register()
         res = self.client.post(
-            'api/v1/auth/login',
-            data=json.dumps(self.test_invalid_password()),
+            'api/v1/login/',
+            data=json.dumps(self.test_user_invalid_pass),
             headers={'content-type': 'application/json'}
         )
         self.assertEqual(res.status_code, 401)
@@ -39,7 +39,7 @@ class UserTestCase(AppBaseTest):
     def test_missing_username_registration(self):
         """Test registration without username"""
         response = self.client.post(
-            'api/v1/auth/register',
+            'api/v1/register/',
             data=json.dumps(self.missing_user_name),
             headers={'content-type': 'application/json'}
         )
@@ -48,7 +48,7 @@ class UserTestCase(AppBaseTest):
     def test_missing_password_registration(self):
         """Test registration without password"""
         response = self.client.post(
-            'api/v1/auth/register',
+            'api/v1/register/',
             data=json.dumps(self.missing_user_password),
             headers={'content-type': 'application/json'}
         )
@@ -57,8 +57,8 @@ class UserTestCase(AppBaseTest):
     def test_user_invalid_data(self):
         """Test user registration with invalid data"""
         response = self.client.post(
-            'api/v1/auth/register',
+            'api/v1/register/',
             data=json.dumps(self.invalid_user_data),
             headers={'content-type': 'application/json'}
         )
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.status_code, 400)

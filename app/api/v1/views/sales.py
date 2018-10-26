@@ -1,36 +1,22 @@
+from flask import request
 from flask_classful import FlaskView, route
 from flask_jwt_extended import jwt_required
-from flask_restful import reqparse
 
 from app.api.v1.models.items.product import Products
 from app.api.v1.views.utils import Authentication
 from app.api.v1.views.utils import Validate
-from ..models.items.sale import Sales
+from ..models.items.sale import SalesModel
 
 
-class SaleView(FlaskView):
+class Sales(FlaskView):
     """sale View Class"""
 
     decorators = [jwt_required]
 
-    parser = reqparse.RequestParser()
-    parser.add_argument(
-        's_name',
-        type=str,
-        required=True,
-        help='Sales Name must be provided'
-    )
-    parser.add_argument(
-        's_quantity',
-        type=int,
-        required=True,
-        help='Sale quantity must be provided'
-    )
-
     @Authentication.requires_admin
     def index(self):
         # TODO: return valid response if none exists
-        sales = Sales().fetch_all_sales()
+        sales = SalesModel().fetch_all_sales()
         if not sales:
             return {
                        'message': 'No sales available'
@@ -42,8 +28,18 @@ class SaleView(FlaskView):
     @Authentication.requires_user
     def post(self):
         """Post new sale"""
-        sale_data = SaleView.parser.parse_args()
+        sale_data = request.data
+
+        if 's_name' not in sale_data:
+            return {
+                       'message': "Sale name is required(s_name)"
+                   }, 400
         s_name = sale_data['s_name']
+
+        if 's_quantity' not in sale_data:
+            return {
+                       'message': "Sale quantity is required(s_quantity)"
+                   }, 400
         s_quantity = sale_data['s_quantity']
 
         invalid_sale_name = Validate().is_input_valid(s_name)
@@ -64,7 +60,7 @@ class SaleView(FlaskView):
         product.p_quantity -= s_quantity
         # update in database
         product.update()
-        sale = Sales(
+        sale = SalesModel(
             s_name=s_name,
             s_price=product.p_price,
             s_quantity=s_quantity

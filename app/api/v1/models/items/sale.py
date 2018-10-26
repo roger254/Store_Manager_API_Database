@@ -3,11 +3,12 @@ from datetime import datetime
 from app.api.v1.models.base_model import BaseDatabase
 
 
-class Sales(BaseDatabase):
+class SalesModel(BaseDatabase):
     """Represents the  Product Model"""
 
     def __init__(self, s_name=None, s_price=None, s_quantity=None):
         super().__init__()
+        self.id = 0
         self.s_name = s_name
         self.s_price = s_price
         self.s_quantity = s_quantity
@@ -17,7 +18,7 @@ class Sales(BaseDatabase):
         """Create product table"""
         self.create_table(
             """
-            CREATE TABLE IF NOT EXIST sales (
+            CREATE TABLE IF NOT EXISTS sales (
             id serial PRIMARY KEY,
             s_name VARCHAR NOT NULL,
             s_price DOUBLE PRECISION,
@@ -36,7 +37,7 @@ class Sales(BaseDatabase):
 
     def map_sale(self, data):
         """map to an object"""
-        sale = Sales(
+        sale = SalesModel(
             s_name=data[1],
             s_price=data[2],
             s_quantity=data[3],

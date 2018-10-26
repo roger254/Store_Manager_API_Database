@@ -1,35 +1,15 @@
+from flask import request
 from flask_classful import FlaskView, route
 from flask_jwt_extended import jwt_required
-from flask_restful import reqparse
 
 from app.api.v1.views.auth import requires_admin
 from .utils import Validate
 from ..models.items.product import Products
 
 
-class ProductView(FlaskView):
+class Product(FlaskView):
     """Product View Class"""
     decorators = [jwt_required]
-
-    parser = reqparse.RequestParser()
-    parser.add_argument(
-        'p_name',
-        type=str,
-        required=True,
-        help='Product Name must be provided'
-    )
-    parser.add_argument(
-        'p_price',
-        type=float,
-        required=True,
-        help='Price should be a float value'
-    )
-    parser.add_argument(
-        'p_quantity',
-        type=int,
-        required=True,
-        help='Product quantity should an int'
-    )
 
     def index(self):
         """Get all products"""
@@ -47,10 +27,22 @@ class ProductView(FlaskView):
     @requires_admin
     def post(self):
         """Create a new product"""
-        product_data = ProductView.parser.parse_args()
+        product_data = request.data
         # if it exists
+        if 'p_name' not in product_data:
+            return {
+                       'message': "Product name is required"
+                   }, 400
         p_name = product_data['p_name']
+        if 'p_price' not in product_data:
+            return {
+                       'message': "Product price is required"
+                   }, 400
         p_price = product_data['p_price']
+        if 'p_quantity' not in product_data:
+            return {
+                       'message': "Product quantity is required"
+                   }, 400
         p_quantity = product_data['p_quantity']
 
         is_invalidate = Validate().is_input_valid(p_name)

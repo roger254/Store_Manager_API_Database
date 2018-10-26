@@ -25,17 +25,17 @@ class AppBaseTest(unittest.TestCase):
             'password': 'test1234'
         }
         self.admin_data = {
-            'username': 'admin',
+            'username': 'root254',
             'password': 'root1234'
         }
         self.missing_user_name = {
             'password': 'test134'
         }
         self.missing_user_password = {
-            'user_name': 'Test User 1'
+            'username': 'Test User 1'
         }
         self.invalid_user_data = {
-            'user_name': 'r45',
+            'username': 'r45',
             'password': 'rr'
         }
         self.test_user_invalid_pass = {
@@ -93,12 +93,11 @@ class AppBaseTest(unittest.TestCase):
         access_token = self.get_admin_token()
         # create item
         response = self.client.post(
-            'api/v1/admin/products',
+            'api/v1/product/',
             data=json.dumps(self.create_product),
-            headers={
-                'content-type': 'application/json',
-                'Authorization': b'Bearer ' + access_token,
-            }
+            headers=dict(
+                Authorization="Bearer " + access_token
+            )
         )
         return response
 
@@ -106,45 +105,33 @@ class AppBaseTest(unittest.TestCase):
         """Post new Sale"""
         access_token = self.get_user_token()
         res = self.client.post(
-            'api/v1/users/1/sale',
+            'api/v1/sales/',
             data=json.dumps(self.create_sale),
-            header={
-                'content-type': 'application/json',
-                'Authorization': b'Bearer' + access_token
-            }
         )
         return res
 
     def register(self):
         """Create new user"""
         response = self.client.post(
-            'api/v1/auth/register',
-            data=json.dumps(self.test_user),
-            headers={
-                'content-type': 'application/json'
-            }
+            'api/v1/register/',
+            data=json.dumps(self.test_user)
         )
         return response
 
     def login(self):
         """Login created User"""
-        res = self.client().post(
-            'ap1/v2/auth/login',
+        res = self.client.post(
+            'api/v1/login/',
             data=json.dumps(self.test_user),
-            headers={
-                'content-type': 'application/json'
-            }
         )
         return res
 
     def admin_login(self):
         """Login created User"""
-        res = self.client().post(
-            'ap1/v2/auth/login',
+        res = self.client.post(
+            'api/v1/login/',
             data=json.dumps(self.admin_data),
-            headers={
-                'content-type': 'application/json'
-            }
+            headers={'content-type': 'application/json'}
         )
         return res
 
@@ -152,11 +139,14 @@ class AppBaseTest(unittest.TestCase):
         """Get user Token"""
         self.register()
         res = self.login()
-        access_token = json.loads(res.data).get('access_token', None)
+        access_token = json.loads(res.data).get('access_token')
+
         return access_token
 
     def get_admin_token(self):
         """Get user Token"""
         res = self.admin_login()
-        access_token = json.loads(res.data).get('access_token', None)
+        print(res.data)
+        access_token = json.loads(res.data).get('access_token')
+        print(access_token)
         return access_token

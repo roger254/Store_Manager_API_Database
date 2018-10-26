@@ -34,13 +34,10 @@ class SaleTestCase(AppBaseTest):
         """Test sale for an unavailable product"""
         access_token = self.get_user_token()
         self.post_product()
+        bearer = 'Bearer {}'.format(access_token)
         res = self.client.post(
-            'api/v1/users/1/sale',
+            'api/v1/sales/',
             data=json.dumps(self.unavailable_product_sale),
-            header={
-                'content-type': 'application/json',
-                'Authorization': b'Bearer ' + access_token
-            }
         )
         self.assertEqual(res.status_code, 400)
 
@@ -49,12 +46,8 @@ class SaleTestCase(AppBaseTest):
         access_token = self.get_user_token()
         self.post_product()
         res = self.client.post(
-            'api/v1/users/1/sale',
+            'api/v1/sales/',
             data=json.dumps(self.missing_sale_name),
-            header={
-                'content-type': 'application/json',
-                'Authorization': b'Bearer ' + access_token
-            }
         )
         self.assertEqual(res.status_code, 400)
 
@@ -63,12 +56,8 @@ class SaleTestCase(AppBaseTest):
         access_token = self.get_user_token()
         self.post_product()
         res = self.client.post(
-            'api/v1/users/1/sale',
+            'api/v1/sales/',
             data=json.dumps(self.missing_sale_price),
-            header={
-                'content-type': 'application/json',
-                'Authorization': b'Bearer ' + access_token
-            }
         )
         self.assertEqual(res.status_code, 400)
 
@@ -77,11 +66,7 @@ class SaleTestCase(AppBaseTest):
         access_token = self.get_user_token()
         self.post_product()
         res = self.client.post(
-            'api/v1/users/1/sale',
+            'api/v1/sales/',
             data=json.dumps(self.exceeding_quantity),
-            header={
-                'content-type': 'application/json',
-                'Authorization': b'Bearer ' + access_token
-            }
         )
         self.assertEqual(res.status_code, 400)

@@ -3,6 +3,8 @@ from flask_script import Manager
 
 from app import create_app
 # import user model
+from app.api.v1.models.items.product import Products
+from app.api.v1.models.items.sale import SalesModel
 from app.api.v1.models.user.user import User
 
 app = create_app('testing')
@@ -27,15 +29,28 @@ def test():
 @manager.command
 def migrate():
     User().create_user_table()
+    Products().create_product_table()
+    SalesModel().create_sales_table()
+
+
+@manager.command
+def drop():
+    User().drop()
+    Products().drop()
+    SalesModel().drop()
+
+
+@manager.command
+def default_admin():
+    user = User(
+        username='Admin254',
+        password='testadmin123',
+        is_admin=True
+    )
+    user.add()
 
 
 # usage python manage.py create_admin
-@manager.command
-def create_admin():
-    """ add admin """
-    user = User(username='admin',
-                password='root2454', is_admin=True)
-    user.add()
 
 
 if __name__ == '__main__':

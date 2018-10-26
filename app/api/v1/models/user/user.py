@@ -8,6 +8,7 @@ class User(BaseDatabase):
 
     def __init__(self, username=None, password=None, is_admin=False):
         super().__init__()
+        self.id = None
         self.username = username
         if password:
             self.hashed_password = generate_password_hash(password)
@@ -45,17 +46,17 @@ class User(BaseDatabase):
 
     def map_details(self, data):
         """Create user from db data"""
-        self.user_id = data[0]
+        self.id = data[0]
         self.username = data[1]
-        self.hashed_password = data[3]
-        self.is_admin = data[4]
+        self.hashed_password = data[2]
+        self.is_admin = data[3]
+        return self
 
     def serialize(self):
         """Return user as a dict"""
         return dict(
             id=self.id,
             username=self.username,
-            hashed_password=self.hashed_password,
             is_admin=self.is_admin
         )
 

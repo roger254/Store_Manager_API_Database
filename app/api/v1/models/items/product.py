@@ -8,6 +8,7 @@ class Products(BaseDatabase):
 
     def __init__(self, p_name=None, p_price=None, p_quantity=None):
         super().__init__()
+        self.id = 0
         self.p_name = p_name
         self.p_price = p_price
         self.p_quantity = p_quantity
@@ -17,7 +18,7 @@ class Products(BaseDatabase):
         """Create product table"""
         self.create_table(
             """
-            CREATE TABLE IF NOT EXIST products (
+            CREATE TABLE IF NOT EXISTS products (
             id serial PRIMARY KEY,
             p_name VARCHAR NOT NULL,
             p_price DOUBLE PRECISION,
@@ -42,7 +43,7 @@ class Products(BaseDatabase):
             p_quantity=data[3],
         )
         product.id = data[0]
-        product.date = data[5]
+        product.date = data[4]
         self = product
         return self
 
@@ -93,11 +94,11 @@ class Products(BaseDatabase):
             return self.map_product(product)
         return None
 
-    def update(self, product_id):
+    def update(self):
         """Update an existing product"""
         self.cur.execute(
             "UPDATE products SET p_name = %s, p_price = %s, p_quantity = %s WHERE id = %s",
-            (self.p_name, self.p_price, self.p_quantity, product_id)
+            (self.p_name, self.p_price, self.p_quantity, self.id)
         )
         self.save()
         self.close()
