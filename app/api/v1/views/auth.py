@@ -1,4 +1,4 @@
-from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import get_jwt_identity, get_raw_jwt
 from functools import wraps
 
 from app.api.v1.models.user.user import User
@@ -34,3 +34,5 @@ def requires_user(f):
         return f(*args, **kwargs)
 
     return wrapper
+
+

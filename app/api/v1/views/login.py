@@ -58,11 +58,19 @@ class Login(FlaskView):
                        'message': 'Password is incorrect'
                    }, 400
         exp = datetime.timedelta(minutes=20)
-        token = create_access_token(
+        access_token = create_access_token(
             identity=user.serialize(),
             expires_delta=exp
         )
+        # refresh_token = create_refresh_token(
+        #     identity=user.serialize(),
+        #     expires_delta=exp
+        # )
+        # response = jsonify({'login': True})
+        # set_access_cookies(response, access_token)
+        # set_refresh_cookies(response, refresh_token)
+
         return {
                    'message': 'Successfully logged in.',
-                   'access_token': token
+                   'access_token': access_token
                }, 200
