@@ -81,3 +81,40 @@ class Product(FlaskView):
         return {
                    'Product': product.serialize()
                }, 201
+
+    @route('/', methods=['PUT'])
+    def put(self):
+        """Update an item"""
+        prod_data = request.data
+        if 'p_name' not in prod_data:
+            return {
+                       'message': 'Product name is required(p_name)'
+                   }, 400
+        if 'p_price' not in prod_data:
+            return {
+                       'message': 'Product price(p_rice) required'
+                   }, 400
+        if 'p_quantity' not in prod_data:
+            return {
+                'message': 'Product quantity(p_quantity) required'
+            }
+        p_name = prod_data['p_name']
+        product = Products().fetch_by_p_name(p_name)
+        if not product:
+            return {
+                       'message': 'Product {} not found'.format(p_name)
+                   }, 400
+
+        p_price = prod_data['p_price']
+        if p_price != product.p_price:
+            product.p_price = p_price
+
+        p_quantity = prod_data['p_quantity']
+        if p_quantity != product.p_quantity:
+            product.p_quantity = p_quantity
+
+        product.update()
+        return {
+            'message': 'Product Successfully Update',
+            'product': product.serialize()
+        }
