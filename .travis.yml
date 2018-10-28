@@ -1,10 +1,14 @@
 language: python
 python:
 - "3.5"
+services:
+- postgresql
 install:
 - pip install --upgrade pip
 - pip install -r requirements.txt
 
 script:
+- python manage.py migrate
+- python manage.py default_admin
 - coverage run manage.py test
 - codeclimate-test-reporter --token a898963a482dddbc2ec858ba38cf2e9df4da7c1f66cefcbf734cfe9645a18788
