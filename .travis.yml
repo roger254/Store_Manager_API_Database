@@ -3,9 +3,6 @@ python:
 - "3.5"
 env:
 - FLASK_ENV='testing'
-- DB_HOST="localhost"
-- DB_USERNAME="postgres"
-- DB_NAME="store_manager"
 services:
 - postgresql
 postgres:
