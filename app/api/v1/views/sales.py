@@ -29,7 +29,7 @@ class Sales(FlaskView):
     def post(self):
         """Post new sale"""
         sale_data = request.data
-
+        print(sale_data)
         if 's_name' not in sale_data:
             return {
                        'message': "Sale name is required(s_name)"

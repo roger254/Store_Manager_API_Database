@@ -18,6 +18,11 @@ class Register(FlaskView):
                    }, 400
         username = user_data['username']
 
+        if not Validate.is_string(username):
+            return {
+                       'message': 'Username must be a string'
+                   }, 400
+
         if 'password' not in user_data:
             return {
                        'message': "Password must be provided"
@@ -39,7 +44,7 @@ class Register(FlaskView):
         if User().fetch_by_username(username):
             return {
                        'message': 'User {} already exists'.format(username)
-                   }, 401
+                   }, 400
 
         user = User(username=username, password=password)
         user.add()

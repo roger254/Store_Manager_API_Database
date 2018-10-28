@@ -20,19 +20,10 @@ class Login(FlaskView):
                        'message': "Username is required"
                    }, 400
         username = user_data['username']
-        if len(username) < 6:
-            return {
-                       'message': "Username must be atleast 6 characters long"
-                   }, 400
 
-        if 'password' not in user_data:
+        if not Validate.is_string(username):
             return {
-                       'message': 'Password is required'
-                   }, 400
-        password = user_data['password']
-        if len(password) < 6:
-            return {
-                       'message': "Password must be atleast 6 characters long"
+                       'message': 'Username must be a string'
                    }, 400
 
         invalid_username = Validate().is_input_valid(username)
@@ -40,6 +31,12 @@ class Login(FlaskView):
             return {
                        'message': invalid_username
                    }, 400
+
+        if 'password' not in user_data:
+            return {
+                       'message': 'Password is required'
+                   }, 400
+        password = user_data['password']
 
         invalid_password = Validate().is_password_valid(password)
         if invalid_password:

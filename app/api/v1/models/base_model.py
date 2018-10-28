@@ -8,12 +8,10 @@ class BaseDatabase:
     def __init__(self):
         self.db_host = current_app.config['DB_HOST']
         self.db_username = current_app.config['DB_USERNAME']
-        self.db_password = current_app.config['DB_PASSWORD']
         self.db_name = current_app.config['DB_NAME']
         self.conn = psycopg2.connect(
             host=self.db_host,
             user=self.db_username,
-            password=self.db_password,
             database=self.db_name
         )
         self.cur = self.conn.cursor()
@@ -30,6 +28,7 @@ class BaseDatabase:
     def drop_table(self, name):
         """Drop existing table(testing)"""
         self.cur.execute("DROP TABLE IF EXISTS " + name)
+        self.save()
 
     def close(self):
         """Close connection"""
