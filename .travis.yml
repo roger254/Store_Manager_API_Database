@@ -1,13 +1,15 @@
 language: python
 python:
 - "3.5"
+env:
+- FLASK_ENV='testing'
 services:
 - postgresql
 install:
 - pip install --upgrade pip
 - pip install -r requirements.txt
 before_script:
-- createdb store_manager_test
+- psql -c 'create database store_manager_test;' -U postgres
 script:
 - python manage.py migrate
 - python manage.py default_admin
