@@ -7,4 +7,4 @@ install:
 
 script:
 - coverage run manage.py test
-- codeclimate-test-reporter --token c597c43ec71041c4499459c0203f0bd8825b9d305527c07b11296b994a3c724b
+- codeclimate-test-reporter --token a898963a482dddbc2ec858ba38cf2e9df4da7c1f66cefcbf734cfe9645a18788
