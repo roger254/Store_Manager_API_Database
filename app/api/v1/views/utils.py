@@ -45,9 +45,9 @@ class Validate:
     @staticmethod
     def is_input_valid(name):
         error = {}
-        valid = re.match("^[a-zA-Z0-9_.-]{6,15}$", name)
+        valid = re.match("^[a-zA-Z0-9_.-]{6,25}$", name)
         if valid is None:
-            error['message'] = "Please enter a valid username"
+            error['message'] = "Please enter a valid name"
         return error
 
     @staticmethod

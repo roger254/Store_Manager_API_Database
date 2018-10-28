@@ -61,7 +61,7 @@ class UserTestCase(AppBaseTest):
             data=self.invalid_username
         )
         self.assertEqual(res.status_code, 400)
-        self.assertEqual('Please enter a valid username', res.json['message']['message'])
+        self.assertEqual('Please enter a valid name', res.json['message']['message'])
 
     def test_invalid_password(self):
         """Test user registration with invalid password"""
@@ -111,7 +111,7 @@ class UserTestCase(AppBaseTest):
             data=self.invalid_username
         )
         self.assertEqual(res.status_code, 400)
-        self.assertEqual("Please enter a valid username", res.json['message']['message'])
+        self.assertEqual("Please enter a valid name", res.json['message']['message'])
 
     def test_invalid_login_password(self):
         """Test invalid login password"""

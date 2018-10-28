@@ -2,7 +2,6 @@ from flask import request
 from flask_classful import FlaskView, route
 from flask_jwt_extended import jwt_required
 
-from app.api.v1.views.auth import requires_admin
 from .utils import Validate
 from ..models.items.product import Products
 
@@ -13,7 +12,7 @@ class Product(FlaskView):
 
     def index(self):
         """Get all products"""
-        print(request.headers)
+
         products = Products().fetch_all_products()
 
         if not products:
@@ -24,38 +23,54 @@ class Product(FlaskView):
                    'Products': [product.serialize() for product in products]
                }, 200
 
-    @requires_admin
+    # @requires_admin
     def post(self):
         """Create a new product"""
+
         product_data = request.data
+
         # if it exists
         if 'p_name' not in product_data:
             return {
                        'message': "Product name is required"
                    }, 400
         p_name = product_data['p_name']
+
         if 'p_price' not in product_data:
             return {
                        'message': "Product price is required"
                    }, 400
         p_price = product_data['p_price']
+
         if 'p_quantity' not in product_data:
             return {
                        'message': "Product quantity is required"
                    }, 400
         p_quantity = product_data['p_quantity']
 
-        is_invalidate = Validate().is_input_valid(p_name)
-        if is_invalidate:
+        is_invalidate = Validate().is_string(p_name)
+        if not is_invalidate:
             return {
-                       'message': is_invalidate
+                       'message': "Please enter a valid product name"
+                   }, 400
+        try:
+            float(p_price)
+        except ValueError:
+            return {
+                       'message': 'Product price must be a float'
                    }, 400
 
+        try:
+            int(p_quantity)
+        except ValueError:
+            return {
+                       'message': 'Product quantity must be an int'
+                   }, 400
         # check if product exists
         product = Products().fetch_by_p_name(p_name=p_name)
         if product:
             return {
-                       'message': 'Product already exist'
+                       'message': 'Product already exists'
                    }, 400
 
         prod = Products(
@@ -82,7 +97,7 @@ class Product(FlaskView):
                    'Product': product.serialize()
                }, 201
 
-    @requires_admin
+    # @requires_admin
     @route('/', methods=['PUT'])
     def put(self):
         """Update an item"""
@@ -117,11 +132,11 @@ class Product(FlaskView):
 
         product.update()
         return {
-            'message': 'Product Successfully Update',
-            'product': product.serialize()
-        }
+                   'message': 'Product Successfully Update',
+                   'product': product.serialize()
+               }, 200
 
-    @requires_admin
+    # @requires_admin
     @route('/', methods=['DELETE'])
     def delete(self):
         """Delete a product"""

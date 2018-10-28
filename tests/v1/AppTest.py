@@ -52,6 +52,11 @@ class AppBaseTest(unittest.TestCase):
             'p_price': 45.5,
             'p_quantity': 50
         }
+        self.test_product_2 = {
+            'p_name': "Product 2",
+            'p_price': 50.5,
+            'p_quantity': 12
+        }
         self.missing_product_name = {
             'p_price': 45.5,
             'p_quantity': 50
@@ -59,6 +64,25 @@ class AppBaseTest(unittest.TestCase):
         self.missing_product_price = {
             'p_name': "Product 1",
             'p_quantity': 50
+        }
+        self.missing_product_quantity = {
+            'p_name': 'Product 1',
+            'p_price': 45.5
+        }
+        self.invalid_product_name = {
+            'p_name': '123456',
+            'p_price': 45.5,
+            'p_quantity': 50
+        }
+        self.invalid_product_price = {
+            'p_name': 'Product 1',
+            'p_price': 'price',
+            'p_quantity': 50
+        }
+        self.invalid_product_quantity = {
+            'p_name': 'Product 1',
+            'p_price': 45.5,
+            'p_quantity': 'fifty'
         }
 
     def register_test_user(self):
@@ -77,3 +101,8 @@ class AppBaseTest(unittest.TestCase):
             data=self.test_user
         )
         return res
+
+    def get_user_access_token(self):
+        """Return login user access token"""
+        res = self.login_test_user()
+        return res.json['access_token']
