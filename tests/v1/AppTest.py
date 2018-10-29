@@ -1,5 +1,6 @@
 import sys
 
+import json
 import os
 import unittest
 
@@ -84,6 +85,32 @@ class AppBaseTest(unittest.TestCase):
             'p_price': 45.5,
             'p_quantity': 'fifty'
         }
+        self.test_sale = {
+            's_name': 'Product 1',
+            's_quantity': 10
+        }
+        self.missing_sale_name = {
+            's_quantity': 10
+        }
+        self.missing_sale_quantity = {
+            's_name': 'Product 1'
+        }
+        self.invalid_sale_name = {
+            's_name': '123456',
+            's_quantity': 10
+        }
+        self.invalid_sale_quantity = {
+            's_name': 'Product 1',
+            's_quantity': 'Rog34'
+        }
+        self.unavailable_product_sale = {
+            's_name': 'Product 17',
+            's_quantity': 10
+        }
+        self.sale_exceeding_product_quantity = {
+            's_name': 'Product 1',
+            's_quantity': 456
+        }
 
     def register_test_user(self):
         """Register a test user"""
@@ -106,3 +133,18 @@ class AppBaseTest(unittest.TestCase):
         """Return login user access token"""
         res = self.login_test_user()
         return res.json['access_token']
+
+    def post_product(self, data, access_token=None):
+        """Post product provided data"""
+        if access_token is None:
+            access_token = self.get_user_access_token()
+        headers = {
+            'Authorization': 'Bearer {}'.format(access_token),
+            "content-type": "application/json"
+        }
+        res = self.client.post(
+            'api/v1/product/',
+            data=json.dumps(data),
+            headers=headers
+        )
+        return res

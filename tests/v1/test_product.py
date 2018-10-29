@@ -10,21 +10,6 @@ from tests.v1.AppTest import AppBaseTest
 class ProductTestCase(AppBaseTest):
     """Product Test Case"""
 
-    def post_product(self, data, access_token=None):
-        """Post product provided data"""
-        if access_token is None:
-            access_token = self.get_user_access_token()
-        headers = {
-            'Authorization': 'Bearer {}'.format(access_token),
-            "content-type": "application/json"
-        }
-        res = self.client.post(
-            'api/v1/product/',
-            data=json.dumps(data),
-            headers=headers
-        )
-        return res
-
     def test_can_post_a_product(self):
         """Test admin can post a product"""
 
