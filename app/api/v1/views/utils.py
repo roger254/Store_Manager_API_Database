@@ -44,13 +44,26 @@ class Validate:
 
     @staticmethod
     def is_input_valid(name):
-        error = []
-        if not re.match("^[a-zA-Z0-9-._@ `]+$", name):
-            error += "Name must be a string"
+        error = {}
+        valid = re.match("^[a-zA-Z0-9_.-]{6,25}$", name)
+        if valid is None:
+            error['message'] = "Please enter a valid name"
+        return error
 
     @staticmethod
     def is_password_valid(password):
         """Validate the password"""
-        error = []
-        if not re.match("^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])[a-zA-Z0-9]{8,15}$", password):
-            error += "Password must be between 8 to 15 characters long"
+        error = {}
+        valid = re.match("[A-Za-z0-9@#$%^&+=]{8,}", password)
+        if valid is None:
+            error['message'] = "Please enter a valid password"
+        return error
+
+    @classmethod
+    def is_string(cls, username):
+        """Test if username is a string"""
+        try:
+            int(username)
+        except ValueError:
+            return True
+        return False

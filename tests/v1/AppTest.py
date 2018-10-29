@@ -20,133 +20,155 @@ class AppBaseTest(unittest.TestCase):
             migrate()
             create_admin_user()
 
+        self.default_admin = {
+            'username': 'root254',
+            'password': 'root1234'
+        }
         self.test_user = {
             'username': 'roger254',
             'password': 'test1234'
         }
-        self.admin_data = {
-            'username': 'root254',
-            'password': 'root1234'
-        }
-        self.missing_user_name = {
-            'password': 'test134'
-        }
-        self.missing_user_password = {
-            'username': 'Test User 1'
-        }
-        self.invalid_user_data = {
-            'username': 'r45',
-            'password': 'rr'
-        }
-        self.test_user_invalid_pass = {
+        self.test_user_incorrect_password = {
             'username': 'roger254',
-            'password': 'test123454'
+            'password': 'Test1234'
         }
-        self.create_product = {
+        self.unavailable_username = {
+            'password': 'test1234'
+        }
+        self.unavailable_password = {
+            'username': 'roger254'
+        }
+        self.int_username = {
+            'username': '123456',
+            'password': 'test1234'
+        }
+        self.invalid_username = {
+            'username': '!-***%45667',
+            'password': 'test1234'
+        }
+        self.invalid_password = {
+            'username': 'roger254',
+            'password': 'erg'
+        }
+
+        # Product test case
+        self.test_product = {
             'p_name': 'Product 1',
-            'p_price': 55.7,
-            'p_quantity': 23
+            'p_price': 45.5,
+            'p_quantity': 50
         }
-        self.update_product = {
-            'p_name': 'Product 2',
-            'p_price': 45.6,
-            'p_quantity': 45
+        self.test_product_2 = {
+            'p_name': "Product 2",
+            'p_price': 50.5,
+            'p_quantity': 12
         }
-        self.missing_p_name = {
-            'p_price': 34.5,
-            'p_quantity': 34
+        self.missing_product_name = {
+            'p_price': 45.5,
+            'p_quantity': 50
         }
-        self.missing_p_price = {
-            'p_name': 'Product 2',
-            'p_quantity': 34
+        self.missing_product_price = {
+            'p_name': "Product 1",
+            'p_quantity': 50
         }
-        self.missing_p_quantity = {
-            'p_name': ' Product 3',
-            'p_price': 34.5
+        self.missing_product_quantity = {
+            'p_name': 'Product 1',
+            'p_price': 45.5
         }
-        self.invalid_product_data = {
-            'p_name': "***bb$%6",
-            'p_price': "34mmin",
-            'p_quantity': "re345"
+        self.invalid_product_name = {
+            'p_name': '123456',
+            'p_price': 45.5,
+            'p_quantity': 50
         }
-        self.create_sale = {
-            's_name': "Product 1",
+        self.invalid_product_price = {
+            'p_name': 'Product 1',
+            'p_price': 'price',
+            'p_quantity': 50
+        }
+        self.invalid_product_quantity = {
+            'p_name': 'Product 1',
+            'p_price': 45.5,
+            'p_quantity': 'fifty'
+        }
+        self.test_sale = {
+            's_name': 'Product 1',
             's_quantity': 10
         }
         self.missing_sale_name = {
-            's_price': 10
+            's_quantity': 10
         }
-        self.missing_sale_price = {
+        self.missing_sale_quantity = {
             's_name': 'Product 1'
         }
-        self.unavailable_product_sale = {
-            's_name': 'Product 6',
-            's_price': 12
+        self.invalid_sale_name = {
+            's_name': '123456',
+            's_quantity': 10
         }
-        self.exceeding_quantity = {
+        self.invalid_sale_quantity = {
             's_name': 'Product 1',
-            's_quantity': 50
+            's_quantity': 'Rog34'
+        }
+        self.unavailable_product_sale = {
+            's_name': 'Product 17',
+            's_quantity': 10
+        }
+        self.sale_exceeding_product_quantity = {
+            's_name': 'Product 1',
+            's_quantity': 456
         }
 
-    def post_product(self):
-        """post new product"""
-        access_token = self.get_admin_token()
-        # create item
-        response = self.client.post(
-            'api/v1/product/',
-            data=json.dumps(self.create_product),
-            headers=dict(
-                Authorization="Bearer " + access_token
-            )
-        )
-        return response
-
-    def post_sale(self):
-        """Post new Sale"""
-        access_token = self.get_user_token()
+    def register_test_user(self, data, access_token=None):
+        """Register a test user"""
+        if access_token is None:
+            access_token = self.get_admin_access_token()
+        headers = {
+            'Authorization': 'Bearer {}'.format(access_token)
+        }
         res = self.client.post(
-            'api/v1/sales/',
-            data=json.dumps(self.create_sale),
-        )
-        return res
-
-    def register(self):
-        """Create new user"""
-        response = self.client.post(
             'api/v1/register/',
-            data=json.dumps(self.test_user)
-        )
-        return response
-
-    def login(self):
-        """Login created User"""
-        res = self.client.post(
-            'api/v1/login/',
-            data=json.dumps(self.test_user),
+            data=data,
+            headers=headers
         )
         return res
 
-    def admin_login(self):
-        """Login created User"""
+    def login_test_user(self):
+        """Login registered test user"""
+
+        self.register_test_user(self.test_user)
         res = self.client.post(
             'api/v1/login/',
-            data=json.dumps(self.admin_data),
-            headers={'content-type': 'application/json'}
+            data=self.test_user
         )
         return res
 
-    def get_user_token(self):
-        """Get user Token"""
-        self.register()
-        res = self.login()
-        access_token = json.loads(res.data).get('access_token')
+    def login_test_admin(self):
+        """login registered admin"""
+        res = self.client.post(
+            'api/v1/login/',
+            data=self.default_admin
+        )
+        return res
 
-        return access_token
+    def get_admin_access_token(self):
+        """Return admins access token"""
+        res = self.login_test_admin()
+        return res.json['access_token']
 
-    def get_admin_token(self):
-        """Get user Token"""
-        res = self.admin_login()
-        print(res.data)
-        access_token = json.loads(res.data).get('access_token')
-        print(access_token)
-        return access_token
+    def get_user_access_token(self):
+        """Return login user access token"""
+        res = self.login_test_user()
+        return res.json['access_token']
+
+    def post_product(self, data, access_token=None):
+        """Post product provided data"""
+        if access_token is None:
+            access_token = self.get_admin_access_token()
+        headers = {
+            'Authorization': 'Bearer {}'.format(access_token),
+            "content-type": "application/json"
+        }
+        res = self.client.post(
+            'api/v1/product/',
+            data=json.dumps(data),
+            headers=headers
+        )
+        return res

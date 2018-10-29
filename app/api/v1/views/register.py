@@ -1,12 +1,15 @@
 from flask import request
 from flask_classful import FlaskView
+from flask_jwt_extended import jwt_required
 
 from app.api.v1.models.user.user import User
+from app.api.v1.views.auth import requires_admin
 from app.api.v1.views.utils import Validate
 
 
 class Register(FlaskView):
     """Register a new user"""
+    decorators = [jwt_required, requires_admin]
 
     def post(self):
         """Create the user"""
@@ -17,6 +20,11 @@ class Register(FlaskView):
                        'message': "Username must be provided"
                    }, 400
         username = user_data['username']
+
+        if not Validate.is_string(username):
+            return {
+                       'message': 'Username must be a string'
+                   }, 400
 
         if 'password' not in user_data:
             return {
@@ -39,7 +47,7 @@ class Register(FlaskView):
         if User().fetch_by_username(username):
             return {
                        'message': 'User {} already exists'.format(username)
-                   }, 401
+                   }, 400
 
         user = User(username=username, password=password)
         user.add()

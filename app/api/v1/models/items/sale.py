@@ -30,7 +30,7 @@ class SalesModel(BaseDatabase):
 
     def add(self):
         """add new sale"""
-        query = 'INSERT INTO products(s_name, s_price,s_quantity,date) VALUES (%s,%s,%s,%s)'
+        query = 'INSERT INTO sales(s_name, s_price,s_quantity,date) VALUES (%s,%s,%s,%s)'
         data = (self.s_name, self.s_price, self.s_quantity, self.date)
         self.cur.execute(query, data)
         self.save()
@@ -43,7 +43,7 @@ class SalesModel(BaseDatabase):
             s_quantity=data[3],
         )
         sale.id = data[0]
-        sale.date = data[5]
+        sale.date = data[4]
         self = sale
         return self
 

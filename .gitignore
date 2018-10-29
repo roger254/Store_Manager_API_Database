@@ -72,7 +72,6 @@ local_settings.py
 db.sqlite3
 
 # Flask stuff:
-instance/
 .webassets-cache
 
 # Scrapy stuff:
@@ -98,7 +97,6 @@ celerybeat-schedule
 
 # Environments
 .env
-.venv
 env/
 venv/
 ENV/
