@@ -1,21 +1,22 @@
 language: python
+
 python:
-- "3.5"
-env:
-- FLASK_ENV='testing'
-services:
-- postgresql
-postgres:
-  adapter: postrgresql
-  database: store_manager_test
-  username: postgres
+- "3.6"
+
 install:
 - pip install --upgrade pip
 - pip install -r requirements.txt
+
+services:
+- postgresql
+addons:
+  postgresql: "9.5"
+
 before_script:
+- psql -c 'create database store_manager;' -U postgres
 - psql -c 'create database store_manager_test;' -U postgres
+- psql -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public to postgres;" -U postgres
+
 script:
-- python manage.py migrate
-- python manage.py default_admin
 - coverage run manage.py test
 - codeclimate-test-reporter --token a898963a482dddbc2ec858ba38cf2e9df4da7c1f66cefcbf734cfe9645a18788
