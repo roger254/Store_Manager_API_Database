@@ -13,7 +13,6 @@ class Product(FlaskView):
 
     def index(self):
         """Get all products"""
-
         products = Products().fetch_all_products()
 
         if not products:
@@ -136,6 +135,8 @@ class Product(FlaskView):
                    'message': 'Product Successfully Update',
                    'product': product.serialize()
                }, 200
+
+            
 
     @requires_admin
     @route('/', methods=['DELETE'])

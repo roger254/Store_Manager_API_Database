@@ -33,17 +33,20 @@ def create_app(config_name):
         jti = decrypted_token['jti']
         return jti in blacklist
 
-    # @jwt.expired_token_loader
-    # def my_expired_token_callback():
-    #     return jsonify({
-    #         'Message': "You've been logged out"
-    #     }), 400
-    #
-    # @jwt.invalid_token_loader
-    # def my_invalid_callback():
-    #     return jsonify({
-    #         'Message': "Please login with correct details"
-    #     }), 400
+      
+    @jwt.expired_token_loader
+    def my_expired_token_callback():
+        return jsonify({
+            'Message': "You've been logged out"
+        }), 400
+    
+    @jwt.invalid_token_loader
+    def my_invalid_callback():
+        return jsonify({
+            'Message': "Please login with correct details"
+        }), 400
+
+
 
     # Views
     Register.register(app, route_prefix='api/v1')
