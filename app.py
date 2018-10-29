@@ -6,7 +6,6 @@ from app.api.v1.models.items.sale import SalesModel
 from app.api.v1.models.user.user import User
 
 app = create_app(os.getenv('FLASK_ENV') or 'default')
-app = create_app(os.getenv('FLASK_ENV') or 'default')
 
 
 @app.cli.command()
