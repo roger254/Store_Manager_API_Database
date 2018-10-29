@@ -3,6 +3,7 @@ from flask_classful import FlaskView, route
 from flask_jwt_extended import jwt_required
 
 from app.api.v1.models.items.product import Products
+from app.api.v1.views.auth import requires_user
 from app.api.v1.views.utils import Validate
 from ..models.items.sale import SalesModel
 
@@ -24,7 +25,7 @@ class Sales(FlaskView):
                    'Sales': [sale.serialize() for sale in sales]
                }, 200
 
-    # @Authentication.requires_user
+    @requires_user
     def post(self):
         """Post new sale"""
         sale_data = request.data

@@ -16,7 +16,7 @@ class SaleTestCase(AppBaseTest):
         headers = {
             'Authorization': 'Bearer {}'.format(access_token)
         }
-        res1 = self.post_product(self.test_product, access_token=access_token)
+        res1 = self.post_product(self.test_product)
         self.assertEqual(res1.status_code, 201)
         res = self.client.post(
             'api/v1/sales/',
@@ -28,7 +28,7 @@ class SaleTestCase(AppBaseTest):
     def test_sale_creation(self):
         """Test if user can make a sale"""
         access_token = self.get_user_access_token()
-        res1 = self.post_product(self.test_product, access_token=access_token)
+        res1 = self.post_product(self.test_product)
         self.assertEqual(res1.status_code, 201)
 
         headers = {

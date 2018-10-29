@@ -6,7 +6,7 @@ import unittest
 
 sys.path.append(os.path.abspath(os.path.dirname(__file__) + '/' + '../..'))
 from app import create_app
-from .test_db import migrate, drop
+from .test_db import migrate, drop, create_admin_user
 
 
 class AppBaseTest(unittest.TestCase):
@@ -18,8 +18,12 @@ class AppBaseTest(unittest.TestCase):
         with self.app.app_context():
             drop()
             migrate()
-            # create_admin_user()
+            create_admin_user()
 
+        self.default_admin = {
+            'username': 'root254',
+            'password': 'root1234'
+        }
         self.test_user = {
             'username': 'roger254',
             'password': 'test1234'
@@ -112,22 +116,42 @@ class AppBaseTest(unittest.TestCase):
             's_quantity': 456
         }
 
-    def register_test_user(self):
+    def register_test_user(self, data, access_token=None):
         """Register a test user"""
+        if access_token is None:
+            access_token = self.get_admin_access_token()
+        headers = {
+            'Authorization': 'Bearer {}'.format(access_token)
+        }
         res = self.client.post(
             'api/v1/register/',
-            data=self.test_user
+            data=data,
+            headers=headers
         )
         return res
 
     def login_test_user(self):
         """Login registered test user"""
-        self.register_test_user()
+
+        self.register_test_user(self.test_user)
         res = self.client.post(
             'api/v1/login/',
             data=self.test_user
         )
         return res
+
+    def login_test_admin(self):
+        """login registered admin"""
+        res = self.client.post(
+            'api/v1/login/',
+            data=self.default_admin
+        )
+        return res
+
+    def get_admin_access_token(self):
+        """Return admins access token"""
+        res = self.login_test_admin()
+        return res.json['access_token']
 
     def get_user_access_token(self):
         """Return login user access token"""
@@ -137,7 +161,7 @@ class AppBaseTest(unittest.TestCase):
     def post_product(self, data, access_token=None):
         """Post product provided data"""
         if access_token is None:
-            access_token = self.get_user_access_token()
+            access_token = self.get_admin_access_token()
         headers = {
             'Authorization': 'Bearer {}'.format(access_token),
             "content-type": "application/json"

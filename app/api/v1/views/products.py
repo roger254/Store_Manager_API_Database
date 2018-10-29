@@ -2,6 +2,7 @@ from flask import request
 from flask_classful import FlaskView, route
 from flask_jwt_extended import jwt_required
 
+from app.api.v1.views.auth import requires_admin
 from .utils import Validate
 from ..models.items.product import Products
 
@@ -23,7 +24,7 @@ class Product(FlaskView):
                    'Products': [product.serialize() for product in products]
                }, 200
 
-    # @requires_admin
+    @requires_admin
     def post(self):
         """Create a new product"""
 
@@ -97,7 +98,7 @@ class Product(FlaskView):
                    'Product': product.serialize()
                }, 201
 
-    # @requires_admin
+    @requires_admin
     @route('/', methods=['PUT'])
     def put(self):
         """Update an item"""
@@ -136,7 +137,7 @@ class Product(FlaskView):
                    'product': product.serialize()
                }, 200
 
-    # @requires_admin
+    @requires_admin
     @route('/', methods=['DELETE'])
     def delete(self):
         """Delete a product"""

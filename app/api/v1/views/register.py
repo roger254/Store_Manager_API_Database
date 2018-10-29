@@ -1,12 +1,15 @@
 from flask import request
 from flask_classful import FlaskView
+from flask_jwt_extended import jwt_required
 
 from app.api.v1.models.user.user import User
+from app.api.v1.views.auth import requires_admin
 from app.api.v1.views.utils import Validate
 
 
 class Register(FlaskView):
     """Register a new user"""
+    decorators = [jwt_required, requires_admin]
 
     def post(self):
         """Create the user"""

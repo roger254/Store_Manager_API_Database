@@ -13,7 +13,7 @@ class ProductTestCase(AppBaseTest):
     def test_can_post_a_product(self):
         """Test admin can post a product"""
 
-        access_token = self.get_user_access_token()
+        access_token = self.get_admin_access_token()
         headers = {
             'Authorization': 'Bearer {}'.format(access_token),
             "content-type": "application/json"
@@ -71,7 +71,7 @@ class ProductTestCase(AppBaseTest):
 
     def test_can_get_all_products(self):
         """Test user can fetch all products"""
-        access_token = self.get_user_access_token()
+        access_token = self.get_admin_access_token()
 
         res = self.post_product(self.test_product, access_token=access_token)
         res2 = self.post_product(self.test_product_2, access_token=access_token)
@@ -88,7 +88,7 @@ class ProductTestCase(AppBaseTest):
     def test_user_can_get_specific_item(self):
         """Test user can get a specific item"""
         access_token = self.get_user_access_token()
-        res = self.post_product(self.test_product, access_token=access_token)
+        res = self.post_product(self.test_product)
         self.assertEqual(res.status_code, 201)
         headers = {
             'Authorization': 'Bearer {}'.format(access_token),
@@ -102,7 +102,7 @@ class ProductTestCase(AppBaseTest):
 
     def test_can_update_a_product(self):
         """Test admin can update a product"""
-        access_token = self.get_user_access_token()
+        access_token = self.get_admin_access_token()
         res = self.post_product(self.test_product, access_token=access_token)
         self.assertEqual(res.status_code, 201)
 
@@ -120,7 +120,7 @@ class ProductTestCase(AppBaseTest):
 
     def test_updating_non_existing_product(self):
         """Test updating a unavailable product"""
-        access_token = self.get_user_access_token()
+        access_token = self.get_admin_access_token()
         headers = {
             'Authorization': 'Bearer {}'.format(access_token)
         }
@@ -137,7 +137,7 @@ class ProductTestCase(AppBaseTest):
 
     def test_can_delete_product(self):
         """Test admin can delete product"""
-        access_token = self.get_user_access_token()
+        access_token = self.get_admin_access_token()
         res1 = self.post_product(self.test_product, access_token=access_token)
         self.assertEqual(res1.status_code, 201)
         headers = {
@@ -153,7 +153,7 @@ class ProductTestCase(AppBaseTest):
 
     def deleting_non_existing_product(self):
         """Test deleting a non existing item"""
-        access_token = self.get_user_access_token()
+        access_token = self.get_admin_access_token()
         headers = {
             'Authorization': 'Bearer {}'.format(access_token)
         }

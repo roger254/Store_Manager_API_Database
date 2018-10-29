@@ -9,77 +9,52 @@ from tests.v1.AppTest import AppBaseTest
 class UserTestCase(AppBaseTest):
     """User Test Case"""
 
-    def register_test_user(self):
-        """Register test user"""
-
-        response = self.client.post(
-            'api/v1/register/',
-            data=self.test_user
-        )
-        return response
-
     def test_user_registration(self):
         """Test user registration"""
 
-        res = self.register_test_user()
+        res = self.register_test_user(self.test_user)
         self.assertEqual(res.status_code, 201)
         self.assertEqual(self.test_user['username'], res.json['user']['username'])
 
     def test_missing_username(self):
         """Test user with missing username"""
-        res = self.client.post(
-            'api/v1/register/',
-            data=self.unavailable_username
-        )
+        res = self.register_test_user(self.unavailable_username)
         self.assertEqual(res.status_code, 400)
         self.assertIn('Username must be provided', res.json['message'])
 
     def test_missing_password(self):
         """Test registration without password"""
 
-        res = self.client.post(
-            'api/v1/register/',
-            data=self.unavailable_password
-        )
+        res = self.register_test_user(self.unavailable_password)
         self.assertEqual(res.status_code, 400)
         self.assertIn('Password must be provided', res.json['message'])
 
     def test_string_username(self):
         """Test User must be a string"""
 
-        res = self.client.post(
-            'api/v1/register/',
-            data=self.int_username
-        )
+        res = self.register_test_user(self.int_username)
         self.assertEqual(res.status_code, 400)
         self.assertIn('Username must be a string', res.json['message'])
 
     def test_invalid_username(self):
         """Test user registration with invalid username"""
-        res = self.client.post(
-            'api/v1/register/',
-            data=self.invalid_username
-        )
+        res = self.register_test_user(self.invalid_username)
         self.assertEqual(res.status_code, 400)
         self.assertEqual('Please enter a valid name', res.json['message']['message'])
 
     def test_invalid_password(self):
         """Test user registration with invalid password"""
-        res = self.client.post(
-            'api/v1/register/',
-            data=self.invalid_password
-        )
+        res = self.register_test_user(self.invalid_password)
         self.assertEqual(res.status_code, 400)
         self.assertEqual('Please enter a valid password', res.json['message']['message'])
 
     def test_user_cannot_register_twice(self):
         """Test user cannot register twice"""
-        res = self.register_test_user()
+        access_token = self.get_admin_access_token()
+        res = self.register_test_user(self.test_user, access_token=access_token)
         self.assertEqual(res.status_code, 201)
-        res = self.client.post(
-            'api/v1/register/',
-            data=self.test_user
-        )
+
+        res = self.register_test_user(data=self.test_user, access_token=access_token)
         self.assertEqual(res.status_code, 400)
         self.assertIn(
             'User {} already exists'.format(self.test_user['username']),
@@ -142,7 +117,7 @@ class UserTestCase(AppBaseTest):
 
     def test_incorrect_login_password(self):
         """Test if user uses an incorrect password"""
-        res = self.register_test_user()
+        res = self.register_test_user(self.test_user)
         self.assertEqual(res.status_code, 201)
 
         res = self.client.post(
@@ -154,7 +129,7 @@ class UserTestCase(AppBaseTest):
 
     def test_successful_login(self):
         """Test user successfully logs in"""
-        res = self.register_test_user()
+        res = self.register_test_user(self.test_user)
         self.assertEqual(res.status_code, 201)
         res = self.client.post(
             'api/v1/login/',
@@ -163,4 +138,3 @@ class UserTestCase(AppBaseTest):
         self.assertEqual(res.status_code, 200)
         self.assertIn('Successfully logged in', res.json['message'])
         self.assertIn('access_token', res.json)
-
