@@ -1,3 +1,4 @@
+import click
 import os
 
 from app import create_app
@@ -32,6 +33,15 @@ def default_admin():
     user.add()
 
 
+@click.command()
+def cli():
+    User().create_user_table()
+    Products().create_product_table()
+    SalesModel().create_sales_table()
+    default_admin()
+
+
 # run app
 if __name__ == '__main__':
+
     app.run(port=8000)
